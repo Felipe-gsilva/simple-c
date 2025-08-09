@@ -19,7 +19,7 @@ endif()
 
 add_definitions(-DBUILD_TYPE="${CMAKE_BUILD_TYPE}")
 
-file(GLOB OS_MODULES src/modules/*/*.c)
+file(GLOB OS_MODULES src/*/*.c)
 file(GLOB SRC_FILES src/*.c)
 file(GLOB TEST_FILES test/*.c)
 
