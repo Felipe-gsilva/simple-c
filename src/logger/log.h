@@ -14,6 +14,9 @@ typedef enum {
   MEM_ALLOC_FAIL = 303,
   MEM_DEALLOC_FAIL = 304,
   MEM_REALLOC_FAIL = 305,
+  FILE_OPEN_FAILURE = 403,
+  FILE_NOT_FOUND = 404,
+  OPEN_FILE_TABLE_MAX_REACHED = 406,
   SEMAPHORE_ERROR = 500,
   SEMAPHORE_INIT_ERROR = 501,
   SEMAPHORE_POST_ERROR = 502,
@@ -23,12 +26,11 @@ typedef enum {
   INVALID_ARGS = 601,
 } status_code;
 
+#define DEFAULT_LOGGER_BUFFER_SIZE 4096 // bytes
+
 // defining correct macros for logging
 #define c_crit_error(s, ...)                                                   \
   c_log(CRIT_ERROR, s, ##__VA_ARGS__, NULL);                                   \
-  clear();                                                                     \
-  refresh();                                                                   \
-  endwin();                                                                    \
   exit(1);
 #define c_error(s, ...) c_log(ERROR, s, ##__VA_ARGS__, NULL)
 #define c_warn(s, ...) c_log(WARN, s, ##__VA_ARGS__, NULL)
@@ -37,7 +39,7 @@ typedef enum {
 
 log_level get_min_log_level();
 
-// do not use this directly unless you are sure you need to
+// do not use c_log directly unless you are sure you need to
 void c_log(log_level level, status_code status_code, const char *str, ...);
 
 #endif

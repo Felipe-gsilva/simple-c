@@ -2,7 +2,6 @@
 
 App app;
 
-
 bool set_envvar(const char *mode) {
   if (strcmp(mode, "Debug") == 0 || strcmp(mode, "DEBUG") == 0) {
     app.debug = true;
@@ -25,6 +24,7 @@ void set_debug_mode() {
 
 int main(int argc, char **argv) {
   set_debug_mode();
-  c_info("testando");
+  init_file_table(MAX_ENTRY_SIZE);
+
   return 0;
 }

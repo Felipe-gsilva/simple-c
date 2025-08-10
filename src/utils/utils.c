@@ -2,8 +2,6 @@
 #include "assert.h"
 #include "stdint.h"
 
-bool valid_int(int v) { return (v > 0 && v < INT32_MAX) ? true : false; }
-
 u32 abs_diff(u32 a, u32 b) { return a > b ? a - b : b - a; }
 
 char *sanitize_str(char *str) {
@@ -18,3 +16,10 @@ char *sanitize_str(char *str) {
 
   return str;
 }
+
+// todo
+const char **str_split(const char *src, const char *delim) {
+  char buf[sizeof(src)];
+  return src;
+}
+
