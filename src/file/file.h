@@ -28,4 +28,6 @@ void init_file_table(u64 max_entries);
 
 bool insert_to_file_table(file_buffer *fb, u64 priority);
 
+bool process_input_file(file_buffer *fb);
+
 #endif

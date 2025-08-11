@@ -48,3 +48,7 @@ bool remove_from_file_table_id(u64 idx) {
 bool remove_from_file_table_name(u64 idx) {
 
 } 
+
+bool process_input_file(file_buffer *fb) {
+  // read and tokenize strings
+}

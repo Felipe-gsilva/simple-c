@@ -11,15 +11,6 @@ typedef struct __App {
   open_file_table oft;
 } App;
 
-typedef enum __token_type {
-  t_identifier = 0,
-  t_operator = 1,
-} token_type;
-
-typedef struct __token {
-  u64 idx;
-  token_type t;
-} token;
 
 int main(int argc, char **argv);
 

@@ -42,23 +42,6 @@ void c_log(log_level level, status_code status, const char *str, ...) {
     printf("| STATUS CODE: ");
   }
   switch (status / 100) {
-    case -1:
-      break;
-    case 0:
-      printf("%d - SCHEDULER |", status);
-      break;
-    case 1:
-      printf("%d - Process Handling Context | ", status);
-      break;
-    case 2:
-      printf("%d - CPU Related Context | ", status);
-      break;
-    case 3:
-      printf("%d - Memory Status Context | ", status);
-      break;
-    case 5:
-      printf("%d - User Status Context | ", status);
-      break;
     default:
       printf("%d - Unknown Status | ", status);
   }
