@@ -21,7 +21,6 @@ typedef struct __open_file_table {
   u64 len;
 } open_file_table;
 
-// procedures
 file_buffer *open_file(const char *path, char *mode);
 
 void init_file_table(u64 max_entries);
