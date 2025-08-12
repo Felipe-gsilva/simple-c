@@ -1,6 +1,7 @@
 #include "file.h"
 #include "../app.h"
 #include "../logger/log.h"
+#include "../scanner/scanner.h"
 
 extern App app;
 
@@ -41,14 +42,22 @@ bool insert_to_file_table(file_buffer *fb, u64 priority) {
   return true;
 }
 
-bool remove_from_file_table_id(u64 idx) {
+bool remove_from_file_table_id(u64 idx) {}
 
-} 
-
-bool remove_from_file_table_name(u64 idx) {
-
-} 
+bool remove_from_file_table_name(u64 idx) {}
 
 bool process_input_file(file_buffer *fb) {
   // read and tokenize strings
+  bool result = true;
+
+  while (!feof(fb->fp)) {
+    char token_buffer[MAX_TOKEN_SIZE];
+    fscanf(fb->fp, "%s", token_buffer);
+    if (!scan_str(token_buffer)) {
+      result = false;
+      break;
+    };
+  }
+
+  return result;
 }
