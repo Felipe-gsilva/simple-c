@@ -2,8 +2,8 @@ projeto de compilador seguindo conceitos da minha aula
 
 plano inicial:
 
-- [ ] leitor de arquivos (tokenizar input)
-- [ ] analisador léxico (scanner)
+- [X] leitor de arquivos (tokenizar input)
+- [X] analisador léxico (scanner)
 - [ ] analisador sintático (parser)
 - [ ] analisador semantico 
 - [ ] otimizador 
