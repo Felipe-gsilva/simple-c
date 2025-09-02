@@ -97,7 +97,7 @@ void print_error(char* error_type) {
 }
 
 int main(void) {
-  printf("Analisador Léxico com análise de erro melhorada.\n");
+  printf("Analisador Léxico com análise de erro.\n");
   printf("Pressione CTRL+D (Linux) ou CTRL+Z (Windows) para encerrar.\n\n");
   yylex();
   return 0;
