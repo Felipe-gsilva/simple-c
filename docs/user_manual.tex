@@ -1,0 +1,218 @@
+\documentclass[12pt,a4paper]{article}
+
+% Pacotes para o português.
+\usepackage[brazilian,provide=*]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{indentfirst}
+\usepackage{url}
+\usepackage{array}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{breakcites}
+\usepackage{float}
+\usepackage{times}
+\usepackage{lipsum}
+\usepackage{booktabs}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart, arrows.meta, positioning, fit}
+
+\usepackage{sectsty}
+\usepackage[compact]{titlesec}
+
+\sectionfont{\normalfont\normalsize\bfseries}
+\subsectionfont{\normalfont\normalsize\bfseries}
+\subsubsectionfont{\normalfont\normalsize\bfseries}
+
+% Comando para marcar o texto para revisão.
+\newcommand{\rev}[1]{\textcolor{red}{#1}}
+
+% Permite escrever aspas normais "text" em vez de ``text''
+\usepackage[autostyle]{csquotes}
+\MakeOuterQuote{"}
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+	
+	\vspace{115pt}
+    \textbf{\Huge{Manual do Usuário - Simple C}}\\
+        
+	\vspace{115pt}
+    Felipe Gomes da Silva \\
+    Luis Henrique Salomão Lobato \\
+	\end{center}
+	
+	\vspace{1cm}
+	\begin{center}
+		\vspace{\fill}
+    \large{Setembro, 2025} 
+	\end{center}
+\end{titlepage}
+
+% Table of contents
+
+\tableofcontents
+\newpage
+\section{Introdução}
+Este manual do usuário fornece uma visão geral do Simple C, uma linguagem de programação que visa simplicar o uso de conceitos fundamentais da linguagem C. O Simple C é projetado para ser fácil de aprender e usar, tornando-o ideal para iniciantes em programação, mas removendo algumas funcionalidades avançadas da linguagem C. 
+
+Neste momento, abordaremos apenas o analisador léxico da linguagem. Utilizamos a ferramenta Flex para construir o analisador léxico, que é responsável por identificar e classificar os tokens na entrada do código-fonte.
+
+\section{Testando o Analisador Léxico}
+
+Para testar o analisador léxico do Simple C, siga os passos abaixo:
+\begin{enumerate}
+  \item Certifique-se de ter o Flex instalado em seu sistema. Você pode verificar isso executando o comando \texttt{flex --version} no terminal.
+  \item Clone o repositório do Simple C do GitHub:
+    \begin{verbatim}
+      git clone github.com/felipe-gsilva/simple-c
+    \end{verbatim}
+  \item Navegue até o diretório do projeto:
+    \begin{verbatim}
+      cd simple-c/flex/
+    \end{verbatim}
+  \item Gere o analisador léxico usando o Flex e o compile com nosso Makefile:
+    \begin{verbatim}
+      make
+    \end{verbatim}
+  \item Execute o analisador léxico com um arquivo de entrada que contenha código Simple C:
+    \begin{verbatim}
+      ./simplec < input_file.c
+    \end{verbatim}
+    Substitua \texttt{input\_file.c} pelo caminho do arquivo que você deseja analisar.
+
+\end{enumerate}
+
+Foram criados alguns arquivos de teste na pasta \texttt{tests} do repositório. Você pode usar esses arquivos para verificar o funcionamento do analisador léxico. Cada arquivo de teste contém exemplos de código Simple C que abrangem diferentes aspectos da linguagem, como declarações de variáveis, estruturas de controle, funções, entre outros. 
+
+Tenha em vista que o analisador sintático ainda não foi implementado, portanto, mudanças na gramática podem ocorrer futuramente.
+
+\newpage
+\section{Tokens Reconhecidos}
+O analisador léxico do Simple C reconhece os seguintes tokens:
+
+\begin{longtable}{lll}
+\caption{Tabela de Tokens do Simple C}
+\label{tab:tokens} \\
+
+\toprule
+\textbf{Nome do Token} & \textbf{Lexema(s)} & \textbf{Descrição} \\
+\midrule
+\endfirsthead
+
+\toprule
+\multicolumn{3}{l}{\small\textit{Tabela \ref{tab:tokens}: Tabela de Tokens do Simple C (Continuação)}} \\
+\textbf{Nome do Token} & \textbf{Lexema(s)} & \textbf{Descrição} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\multicolumn{3}{l}{\textbf{Palavras-chave: Tipos de Dados}} \\
+\midrule
+KEYWORD\_INT & \texttt{int} & Palavra-chave para tipo inteiro. \\
+KEYWORD\_FLOAT & \texttt{float} & Palavra-chave para tipo ponto flutuante. \\
+KEYWORD\_CHAR & \texttt{char} & Palavra-chave para tipo caractere. \\
+KEYWORD\_STRING & \texttt{string} & Palavra-chave para tipo string (cadeia de caracteres). \\
+KEYWORD\_VOID & \texttt{void} & Palavra-chave para tipo vazio/nulo. \\
+KEYWORD\_BOOL & \texttt{bool} & Palavra-chave para tipo booleano. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Palavras-chave: Controle de Fluxo e Comandos}} \\
+\midrule
+KEYWORD\_IF & \texttt{if} & Inicia uma estrutura condicional. \\
+KEYWORD\_ELSE & \texttt{else} & Bloco alternativo de uma estrutura condicional. \\
+KEYWORD\_FOR & \texttt{for} & Inicia um laço de repetição `for`. \\
+KEYWORD\_WHILE & \texttt{while} & Inicia um laço de repetição `while`. \\
+KEYWORD\_DO & \texttt{do} & Inicia um laço de repetição `do-while`. \\
+KEYWORD\_SWITCH & \texttt{switch} & Inicia uma estrutura de seleção múltipla. \\
+KEYWORD\_CASE & \texttt{case} & Define um rótulo dentro de um `switch`. \\
+KEYWORD\_DEFAULT & \texttt{default} & Define o rótulo padrão de um `switch`. \\
+KEYWORD\_BREAK & \texttt{break} & Interrompe a execução de um laço ou `switch`. \\
+KEYWORD\_CONTINUE & \texttt{continue} & Pula para a próxima iteração de um laço. \\
+KEYWORD\_RETURN & \texttt{return} & Retorna um valor de uma função. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Identificadores e Literais}} \\
+\midrule
+IDENTIFICADOR & \texttt{var}, \texttt{\_x}, ... & Nome de variável, função, etc. \\
+INT & \texttt{123}, \texttt{42} & Valor literal inteiro. \\
+FLOAT & \texttt{3.14}, \texttt{0.5} & Valor literal de ponto flutuante. \\
+CHAR & \texttt{'a'}, \texttt{'\textbackslash n'} & Valor literal de caractere. \\
+STRING & \texttt{"hello"} & Valor literal de string. \\
+BOOLEAN\_LITERAL & \texttt{true}, \texttt{false} & Valor literal booleano. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Operadores}} \\
+\midrule
+OP\_SOMA & \texttt{+} & Operador de adição. \\
+OP\_SUB & \texttt{-} & Operador de subtração. \\
+OP\_MULT & \texttt{*} & Operador de multiplicação. \\
+OP\_DIV & \texttt{/} & Operador de divisão. \\
+OP\_MOD & \texttt{\%} & Operador de módulo (resto da divisão). \\
+OP\_ATRIBUICAO & \texttt{=} & Operador de atribuição simples. \\
+OP\_INC\_ATRIBUICAO & \texttt{+=} & Operador de atribuição com adição. \\
+OP\_DEC\_ATRIBUICAO & \texttt{-=} & Operador de atribuição com subtração. \\
+OP\_MULT\_ATRIBUICAO & \texttt{*=} & Operador de atribuição com multiplicação. \\
+OP\_DIV\_ATRIBUICAO & \texttt{/=} & Operador de atribuição com divisão. \\
+OP\_INC & \texttt{++} & Operador de incremento. \\
+OP\_DEC & \texttt{--} & Operador de decremento. \\
+OP\_IGUAL & \texttt{==} & Operador relacional de igualdade. \\
+OP\_DIFERENTE & \texttt{!=} & Operador relacional de desigualdade. \\
+OP\_MENOR & \texttt{<} & Operador relacional menor que. \\
+OP\_MAIOR & \texttt{>} & Operador relacional maior que. \\
+OP\_MENOR\_IGUAL & \texttt{<=} & Operador relacional menor ou igual que. \\
+OP\_MAIOR\_IGUAL & \texttt{>=} & Operador relacional maior ou igual que. \\
+OP\_AND & \texttt{\&\&} & Operador lógico E (AND). \\
+OP\_OR & \texttt{||} & Operador lógico OU (OR). \\
+OP\_NOT & \texttt{!} & Operador lógico de negação (NOT). \\
+\midrule
+\multicolumn{3}{l}{\textbf{Pontuadores e Delimitadores}} \\
+\midrule
+PONTO\_VIRGULA & \texttt{;} & Finalizador de instrução. \\
+DOIS\_PONTOS & \texttt{:} & Usado em casos de `switch`. \\
+VIRGULA & \texttt{,} & Separador de elementos (ex: em listas). \\
+ABRE\_PARENTESES & \texttt{(} & Abre lista de parâmetros ou expressão. \\
+FECHA\_PARENTESES & \texttt{)} & Fecha lista de parâmetros ou expressão. \\
+ABRE\_CHAVES & \texttt{\{} & Abre um bloco de código. \\
+FECHA\_CHAVES & \texttt{\}} & Fecha um bloco de código. \\
+ABRE\_COLCHETES & \texttt{[} & Abre a declaração/acesso de um array. \\
+FECHA\_COLCHETES & \texttt{]} & Fecha a declaração/acesso de um array. \\
+\end{longtable}
+
+\section{Análise de Erros}
+
+A função \texttt{print\_error} exibe as mensagens de erro léxico e inclui a linha, coluna e token que causaram o erro. Para isto, utilizamos rastreamento de posição durante toda a leitura do código-fonte.
+
+\subsection{Rastreamento de Posição}
+
+Para tratar os erros léxicos de forma eficiente, o analisador léxico do Simple C implementa um mecanismo de rastreamento de posição. Para isto, são declaradas 2 variáveis globais, \texttt{current\_line} e \texttt{current\_col}, que armazenam a linha e a coluna atuais do analisador léxico, respectivamente. Essas variáveis são atualizadas conforme o analisador lê o código-fonte, permitindo que mensagens de erro incluam informações precisas sobre a localização do erro.
+
+\section{Gerenciamento de Estados}
+
+Para melhor gerenciar o estado do analisador léxico, utilizamos a funcionalidade de estados do Flex. Em especial, foram criados 2 estados diferentes: \texttt{IN\_COMMENT} e \texttt{IN\_STRING}. 
+
+\subsection{Comentários}
+Os comentários podem aparecer de 2 formas no código: (i) comentários de linha única, que começam com \texttt{//} e se estendem até o final da linha; (ii) comentários de bloco, que começam com \texttt{/*} e terminam com \texttt{*/}.
+
+\subsection{Strings}
+
+As strings são sequências de caracteres delimitadas por aspas duplas (\texttt{\"}). O analisador léxico reconhece strings e trata caracteres de escape, como \texttt{\textbackslash n} para nova linha e \texttt{\textbackslash t} para tabulação.
+
+Para isso, foi-se utilizado da função \texttt{yymore()} do Flex, que permite concatenar a string lida em \texttt{yytext} com a próxima parte da string lida, até que o caractere de fechamento (\texttt{\"}) seja encontrado.
+
+\section{Descrição da linguagem regular}
+
+\section{Aceitador}
+
+\section{Conclusão}
+
+\end{document}

@@ -1,5 +1,0 @@
-int carlos = "carlos";
-
-if (carlos == 5) {
-  print("raf");
-}

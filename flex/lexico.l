@@ -36,34 +36,52 @@ FLOAT     [0-9]+\.[0-9]*|\.[0-9]+
     return 0;
 }
 
-"if"      { print_token("KEYWORD_IF"); update_col(); }
-"else"    { print_token("KEYWORD_ELSE"); update_col(); }
-"while"   { print_token("KEYWORD_WHILE"); update_col(); }
-"int"     { print_token("KEYWORD_INT"); update_col(); }
-"return"  { print_token("KEYWORD_RETURN"); update_col(); }
+"int"      { print_token("KEYWORD_INT"); update_col(); }
+"float"    { print_token("KEYWORD_FLOAT"); update_col(); }
+"char"     { print_token("KEYWORD_CHAR"); update_col(); }
+"string"   { print_token("KEYWORD_STRING"); update_col(); }
+"void"     { print_token("KEYWORD_VOID"); update_col(); }
+"bool"     { print_token("KEYWORD_BOOL"); update_col(); }
+"if"       { print_token("KEYWORD_IF"); update_col(); }
+"else"     { print_token("KEYWORD_ELSE"); update_col(); }
+"for"      { print_token("KEYWORD_FOR"); update_col(); }
+"break"    { print_token("KEYWORD_BREAK"); update_col(); }
+"continue" { print_token("KEYWORD_CONTINUE"); update_col(); }
+"switch"   { print_token("KEYWORD_SWITCH"); update_col(); }
+"case"     { print_token("KEYWORD_CASE"); update_col(); }
+"default"  { print_token("KEYWORD_DEFAULT"); update_col(); }
+"do"       { print_token("KEYWORD_DO"); update_col(); }
+"while"    { print_token("KEYWORD_WHILE"); update_col(); }
+"return"   { print_token("KEYWORD_RETURN"); update_col(); }
 
-\"        { BEGIN(IN_STRING); update_col(); }
-<IN_STRING>\"       { print_token("STRING"); update_col(); BEGIN(INITIAL); }
-<IN_STRING>[^"\n]+  { }
-<IN_STRING>\n       {
-    print_error("String multilinha não permitida");
-    current_line++; current_col = 1;
-    BEGIN(INITIAL);
-}
-<IN_STRING><<EOF>>  {
-    print_error("String não foi fechada");
-    return 0;
-}
+"true"    { print_token("BOOLEAN_LITERAL"); update_col(); }
+"false"   { print_token("BOOLEAN_LITERAL"); update_col(); }
+
+\"                         { BEGIN(IN_STRING); yymore(); }
+<IN_STRING>(\\.|[^\\"\n])+ { yymore(); }
+<IN_STRING>\"              { print_token("STRING"); update_col(); BEGIN(INITIAL); }
+<IN_STRING>\n              {
+                            print_error("String multilinha não permitida");
+                            current_line++; current_col = 1;
+                            BEGIN(INITIAL);
+                           }
+<IN_STRING><<EOF>>         {
+                            print_error("String não foi fechada");
+                            return 0;
+                           }
 
 {ID}      { print_token("IDENTIFICADOR"); update_col(); }
 {FLOAT}   { print_token("FLOAT"); update_col(); }
 {INT}     { print_token("INT"); update_col(); }
-\'.\'   { print_token("CHAR"); update_col(); }
+\'(\\.|[^'\\])\'   { print_token("CHAR"); update_col(); }
 
 \=\=      { print_token("OP_IGUAL"); update_col(); }
 \!=      { print_token("OP_DIFERENTE"); update_col(); }
 \<\=      { print_token("OP_MENOR_IGUAL"); update_col(); }
 \>\=      { print_token("OP_MAIOR_IGUAL"); update_col(); }
+\<       { print_token("OP_MENOR"); update_col(); }
+\>       { print_token("OP_MAIOR"); update_col(); }
+!        { print_token("OP_NOT"); update_col(); }
 \&\&      { print_token("OP_AND"); update_col(); }
 \|\|      { print_token("OP_OR"); update_col(); }
 \=       { print_token("OP_ATRIBUICAO"); update_col(); }
@@ -71,11 +89,23 @@ FLOAT     [0-9]+\.[0-9]*|\.[0-9]+
 \-       { print_token("OP_SUB"); update_col(); }
 \*       { print_token("OP_MULT"); update_col(); }
 \/       { print_token("OP_DIV"); update_col(); }
+\+\=      { print_token("OP_INC_ATRIBUICAO"); update_col(); }
+\-\=     { print_token("OP_DEC_ATRIBUICAO"); update_col(); }
+\/\=    { print_token("OP_DIV_ATRIBUICAO"); update_col(); }
+\*\=    { print_token("OP_MULT_ATRIBUICAO"); update_col(); }
+\-\-     { print_token("OP_DEC"); update_col(); }
+\+\+     { print_token("OP_INC"); update_col(); }
+\%       { print_token("OP_MOD"); update_col(); }
+
 \;       { print_token("PONTO_VIRGULA"); update_col(); }
+\:       { print_token("DOIS_PONTOS"); update_col(); }
 \(       { print_token("ABRE_PARENTESES"); update_col(); }
 \)       { print_token("FECHA_PARENTESES"); update_col(); }
 \{       { print_token("ABRE_CHAVES"); update_col(); }
 \}       { print_token("FECHA_CHAVES"); update_col(); }
+\,       { print_token("VIRGULA"); update_col(); }
+\[       { print_token("ABRE_COLCHETES"); update_col(); }
+\]       { print_token("FECHA_COLCHETES"); update_col(); }
 
 {INT}{ID} { print_error("Identificador não pode começar com número"); update_col(); }
 \'([^']{2,})\' { print_error("Literal de char mal formado, contém múltiplos caracteres"); update_col(); }
@@ -83,7 +113,7 @@ FLOAT     [0-9]+\.[0-9]*|\.[0-9]+
 
 %%
 void print_token(char *token) {
-  printf("Linha %-3d, Col %-3d | %-20s =>\t%s\n", current_line, current_col, token, yytext);
+  printf("Linha %03d, Col %03d | %-20s =>\t%s\n", current_line, current_col, token, yytext);
 }
 
 void print_error(char* error_type) {
