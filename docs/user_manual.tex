@@ -207,7 +207,7 @@ Os comentários podem aparecer de 2 formas no código: (i) comentários de linha
 
 As strings são sequências de caracteres delimitadas por aspas duplas (\texttt{\"}). O analisador léxico reconhece strings e trata caracteres de escape, como \texttt{\textbackslash n} para nova linha e \texttt{\textbackslash t} para tabulação.
 
-Para isso, foi-se utilizado da função \texttt{yymore()} do Flex, que permite concatenar a string lida em \texttt{yytext} com a próxima parte da string lida, até que o caractere de fechamento (\texttt{\"}) seja encontrado.
+Para isso, foi-se utilizado a função \texttt{yymore()} do Flex, que permite concatenar a string lida em \texttt{yytext} com a próxima parte da string lida, até que o caractere de fechamento (\texttt{\"}) seja encontrado.
 
 \section{Descrição da linguagem regular}
 
