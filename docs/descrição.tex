@@ -1,0 +1,207 @@
+\documentclass[12pt,a4paper]{article}
+
+% Pacotes para o português.
+\usepackage[brazilian,provide=*]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{indentfirst}
+\usepackage{url}
+\usepackage{array}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{breakcites}
+\usepackage{float}
+\usepackage{times}
+\usepackage{lipsum}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usetikzlibrary{shapes.multipart, arrows.meta, positioning, fit}
+
+\usepackage{sectsty}
+\usepackage[compact]{titlesec}
+
+\sectionfont{\normalfont\normalsize\bfseries}
+\subsectionfont{\normalfont\normalsize\bfseries}
+\subsubsectionfont{\normalfont\normalsize\bfseries}
+
+% Comando para marcar o texto para revisão.
+\newcommand{\rev}[1]{\textcolor{red}{#1}}
+
+% Permite escrever aspas normais "text" em vez de ``text''
+\usepackage[autostyle]{csquotes}
+\MakeOuterQuote{"}
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+	
+	\vspace{115pt}
+ \textbf{\Huge{Descrição da Linguagem Regular}}\\
+  
+	\vspace{115pt}
+ Felipe Gomes da Silva \\
+ Luis Henrique Salomão Lobato \\
+	\end{center}
+	
+	\vspace{1cm}
+	\begin{center}
+		\vspace{\fill}
+ \large{Setembro, 2025} 
+	\end{center}
+\end{titlepage}
+
+
+\section{Tokens Reconhecidos}
+\label{sec:token}
+
+O analisador léxico da linguagem Simple C toma a decisão de aceitar ou não determinada sentença com base nos tokens destacados na Tabela \ref{tab:tokens}
+
+\begin{longtable}{lll}
+\caption{Tabela de Tokens do Simple C}
+\label{tab:tokens} \\
+
+\toprule
+\textbf{Nome do Token} & \textbf{Lexema(s)} & \textbf{Descrição} \\
+\midrule
+\endfirsthead
+
+\toprule
+\multicolumn{3}{l}{\small\textit{Tabela \ref{tab:tokens}: Tabela de Tokens do Simple C (Continuação)}} \\
+\textbf{Nome do Token} & \textbf{Lexema(s)} & \textbf{Descrição} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\multicolumn{3}{l}{\textbf{Palavras-chave: Tipos de Dados}} \\
+\midrule
+KEYWORD\_INT & \texttt{int} & Palavra-chave para tipo inteiro. \\
+KEYWORD\_FLOAT & \texttt{float} & Palavra-chave para tipo ponto flutuante. \\
+KEYWORD\_CHAR & \texttt{char} & Palavra-chave para tipo caractere. \\
+KEYWORD\_STRING & \texttt{string} & Palavra-chave para tipo string (cadeia de caracteres). \\
+KEYWORD\_VOID & \texttt{void} & Palavra-chave para tipo vazio/nulo. \\
+KEYWORD\_BOOL & \texttt{bool} & Palavra-chave para tipo booleano. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Palavras-chave: Controle de Fluxo e Comandos}} \\
+\midrule
+KEYWORD\_IF & \texttt{if} & Inicia uma estrutura condicional. \\
+KEYWORD\_ELSE & \texttt{else} & Bloco alternativo de uma estrutura condicional. \\
+KEYWORD\_FOR & \texttt{for} & Inicia um laço de repetição `for`. \\
+KEYWORD\_WHILE & \texttt{while} & Inicia um laço de repetição `while`. \\
+KEYWORD\_DO & \texttt{do} & Inicia um laço de repetição `do-while`. \\
+KEYWORD\_SWITCH & \texttt{switch} & Inicia uma estrutura de seleção múltipla. \\
+KEYWORD\_CASE & \texttt{case} & Define um rótulo dentro de um `switch`. \\
+KEYWORD\_DEFAULT & \texttt{default} & Define o rótulo padrão de um `switch`. \\
+KEYWORD\_BREAK & \texttt{break} & Interrompe a execução de um laço ou `switch`. \\
+KEYWORD\_CONTINUE & \texttt{continue} & Pula para a próxima iteração de um laço. \\
+KEYWORD\_RETURN & \texttt{return} & Retorna um valor de uma função. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Identificadores e Literais}} \\
+\midrule
+IDENTIFICADOR & \texttt{var}, \texttt{\_x}, ... & Nome de variável, função, etc. \\
+INT & \texttt{123}, \texttt{42} & Valor literal inteiro. \\
+FLOAT & \texttt{3.14}, \texttt{0.5} & Valor literal de ponto flutuante. \\
+CHAR & \texttt{'a'}, \texttt{'\textbackslash n'} & Valor literal de caractere. \\
+STRING & \texttt{"hello"} & Valor literal de string. \\
+BOOLEAN\_LITERAL & \texttt{true}, \texttt{false} & Valor literal booleano. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Operadores}} \\
+\midrule
+OP\_SOMA & \texttt{+} & Operador de adição. \\
+OP\_SUB & \texttt{-} & Operador de subtração. \\
+OP\_MULT & \texttt{*} & Operador de multiplicação. \\
+OP\_DIV & \texttt{/} & Operador de divisão. \\
+OP\_MOD & \texttt{\%} & Operador de módulo (resto da divisão). \\
+OP\_ATRIBUICAO & \texttt{=} & Operador de atribuição simples. \\
+OP\_INC\_ATRIBUICAO & \texttt{+=} & Operador de atribuição com adição. \\
+OP\_DEC\_ATRIBUICAO & \texttt{-=} & Operador de atribuição com subtração. \\
+OP\_MULT\_ATRIBUICAO & \texttt{*=} & Operador de atribuição com multiplicação. \\
+OP\_DIV\_ATRIBUICAO & \texttt{/=} & Operador de atribuição com divisão. \\
+OP\_INC & \texttt{++} & Operador de incremento. \\
+OP\_DEC & \texttt{--} & Operador de decremento. \\
+OP\_IGUAL & \texttt{==} & Operador relacional de igualdade. \\
+OP\_DIFERENTE & \texttt{!=} & Operador relacional de desigualdade. \\
+OP\_MENOR & \texttt{<} & Operador relacional menor que. \\
+OP\_MAIOR & \texttt{>} & Operador relacional maior que. \\
+OP\_MENOR\_IGUAL & \texttt{<=} & Operador relacional menor ou igual que. \\
+OP\_MAIOR\_IGUAL & \texttt{>=} & Operador relacional maior ou igual que. \\
+OP\_AND & \texttt{\&\&} & Operador lógico E (AND). \\
+OP\_OR & \texttt{||} & Operador lógico OU (OR). \\
+OP\_NOT & \texttt{!} & Operador lógico de negação (NOT). \\
+\midrule
+\multicolumn{3}{l}{\textbf{Pontuadores e Delimitadores}} \\
+\midrule
+PONTO\_VIRGULA & \texttt{;} & Finalizador de instrução. \\
+DOIS\_PONTOS & \texttt{:} & Usado em casos de `switch`. \\
+VIRGULA & \texttt{,} & Separador de elementos (ex: em listas). \\
+ABRE\_PARENTESES & \texttt{(} & Abre lista de parâmetros ou expressão. \\
+FECHA\_PARENTESES & \texttt{)} & Fecha lista de parâmetros ou expressão. \\
+ABRE\_CHAVES & \texttt{\{} & Abre um bloco de código. \\
+FECHA\_CHAVES & \texttt{\}} & Fecha um bloco de código. \\
+ABRE\_COLCHETES & \texttt{[} & Abre a declaração/acesso de um array. \\
+FECHA\_COLCHETES & \texttt{]} & Fecha a declaração/acesso de um array. \\
+\end{longtable}
+
+
+\section{Descrição da linguagem regular para o analisador léxico}
+\label{sec:desc}
+
+A linguagem regular estruturada para a aceitação de cadeias pelo analisador léxico da linguagem Simple-C pode ser descrita através das expressões regulares e definições presentes na Tabela \ref{tab:expressoes}. Deste modo, é garantido que variáveis não sejam declaradas com números como primeiro caractere da cadeia, além de outros erros léxicos devidamente discutidos.
+
+\begin{table}[H]
+\centering
+\caption{Expressões regulares do analisador léxico.}
+\label{tab:expressoes}
+\begin{tabular}{l p{5cm} l}
+\toprule
+\textbf{Expressão Regular} & \textbf{Descrição} & \textbf{Tipo} \\
+\midrule
+\texttt{\detokenize{[a-zA-Z_][a-zA-Z0-9_]*}} & Reconhece identificadores válidos que começam com uma letra ou um sublinhado. & Identificador \\
+\addlinespace
+\texttt{\detokenize{[0-9]+}} & Reconhece números inteiros. & Literal \\
+\addlinespace
+\texttt{\detokenize{[0-9]+\.[0-9]*|\.[0-9]+}} & Reconhece números de ponto flutuante. & Literal \\
+\midrule
+\texttt{\detokenize{//.*}} & Comentário de linha única, que começa com \texttt{//} e vai até o final da linha. & Comentário \\
+\addlinespace
+\texttt{\detokenize{/*}} & Inicia um comentário de bloco. & Comentário \\
+\addlinespace
+\texttt{\detokenize{<IN_COMMENT>"*/"}} & Fecha um comentário de bloco. & Comentário \\
+\midrule
+\texttt{\detokenize{"(\.|[^"\n])+"}} & Conteúdo de uma string, incluindo caracteres escapados. & String \\
+\addlinespace
+\texttt{\detokenize{'(\.|[^'\\])'}} & Reconhece literais de caracteres. & Caractere \\
+\midrule
+\texttt{\detokenize{==, !=, <=, >=, etc.}} & Operadores de comparação, lógicos e aritméticos. & Operador \\
+\addlinespace
+\texttt{\detokenize{;, <, >, {, }}} & Símbolos de pontuação e agrupamento. & Símbolo \\
+\midrule
+\texttt{\detokenize{{INT}{ID}}} & Captura identificadores que começam com um número, que é um erro léxico. & Erro \\
+\addlinespace
+\texttt{\detokenize{.}} & Captura qualquer caractere que não corresponda a nenhuma regra. & Erro \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ainda, é possível visualizar o diagrama aceitador da linguagem regular do analisador léxico na Figura \ref{fig:placeholder}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{}
+    \caption{Caption}
+    \label{fig:placeholder}
+\end{figure}
+
+\end{document}

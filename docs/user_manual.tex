@@ -5,6 +5,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
+\usepackage{url}
+\usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{longtable}
 \usepackage{indentfirst}
@@ -21,8 +23,8 @@
 \usepackage{times}
 \usepackage{lipsum}
 \usepackage{booktabs}
-
 \usepackage{tikz}
+\usepackage{amsmath}
 \usetikzlibrary{shapes.multipart, arrows.meta, positioning, fit}
 
 \usepackage{sectsty}
@@ -45,17 +47,17 @@
 	\begin{center}
 	
 	\vspace{115pt}
-    \textbf{\Huge{Manual do Usuário - Simple C}}\\
-        
+ \textbf{\Huge{Manual do Usuário - Simple C}}\\
+  
 	\vspace{115pt}
-    Felipe Gomes da Silva \\
-    Luis Henrique Salomão Lobato \\
+ Felipe Gomes da Silva \\
+ Luis Henrique Salomão Lobato \\
 	\end{center}
 	
 	\vspace{1cm}
 	\begin{center}
 		\vspace{\fill}
-    \large{Setembro, 2025} 
+ \large{Setembro, 2025} 
 	\end{center}
 \end{titlepage}
 
@@ -64,32 +66,35 @@
 \tableofcontents
 \newpage
 \section{Introdução}
+\label{sec:intd}
+
 Este manual do usuário fornece uma visão geral do Simple C, uma linguagem de programação que visa simplicar o uso de conceitos fundamentais da linguagem C. O Simple C é projetado para ser fácil de aprender e usar, tornando-o ideal para iniciantes em programação, mas removendo algumas funcionalidades avançadas da linguagem C. 
 
 Neste momento, abordaremos apenas o analisador léxico da linguagem. Utilizamos a ferramenta Flex para construir o analisador léxico, que é responsável por identificar e classificar os tokens na entrada do código-fonte.
 
 \section{Testando o Analisador Léxico}
+\label{sec:test}
 
 Para testar o analisador léxico do Simple C, siga os passos abaixo:
 \begin{enumerate}
   \item Certifique-se de ter o Flex instalado em seu sistema. Você pode verificar isso executando o comando \texttt{flex --version} no terminal.
   \item Clone o repositório do Simple C do GitHub:
-    \begin{verbatim}
-      git clone github.com/felipe-gsilva/simple-c
-    \end{verbatim}
+ \begin{verbatim}
+git clone github.com/felipe-gsilva/simple-c
+ \end{verbatim}
   \item Navegue até o diretório do projeto:
-    \begin{verbatim}
-      cd simple-c/flex/
-    \end{verbatim}
+ \begin{verbatim}
+cd simple-c/flex/
+ \end{verbatim}
   \item Gere o analisador léxico usando o Flex e o compile com nosso Makefile:
-    \begin{verbatim}
-      make
-    \end{verbatim}
+ \begin{verbatim}
+make
+ \end{verbatim}
   \item Execute o analisador léxico com um arquivo de entrada que contenha código Simple C:
-    \begin{verbatim}
-      ./simplec < input_file.c
-    \end{verbatim}
-    Substitua \texttt{input\_file.c} pelo caminho do arquivo que você deseja analisar.
+ \begin{verbatim}
+./simplec < input_file.c
+ \end{verbatim}
+ Substitua \texttt{input\_file.c} pelo caminho do arquivo que você deseja analisar.
 
 \end{enumerate}
 
@@ -99,6 +104,8 @@ Tenha em vista que o analisador sintático ainda não foi implementado, portanto
 
 \newpage
 \section{Tokens Reconhecidos}
+\label{sec:token}
+
 O analisador léxico do Simple C reconhece os seguintes tokens:
 
 \begin{longtable}{lll}
@@ -189,6 +196,7 @@ FECHA\_COLCHETES & \texttt{]} & Fecha a declaração/acesso de um array. \\
 \end{longtable}
 
 \section{Análise de Erros}
+\label{sec:err}
 
 A função \texttt{print\_error} exibe as mensagens de erro léxico e inclui a linha, coluna e token que causaram o erro. Para isto, utilizamos rastreamento de posição durante toda a leitura do código-fonte.
 
@@ -197,7 +205,7 @@ A função \texttt{print\_error} exibe as mensagens de erro léxico e inclui a l
 Para tratar os erros léxicos de forma eficiente, o analisador léxico do Simple C implementa um mecanismo de rastreamento de posição. Para isto, são declaradas 2 variáveis globais, \texttt{current\_line} e \texttt{current\_col}, que armazenam a linha e a coluna atuais do analisador léxico, respectivamente. Essas variáveis são atualizadas conforme o analisador lê o código-fonte, permitindo que mensagens de erro incluam informações precisas sobre a localização do erro.
 
 \section{Gerenciamento de Estados}
-
+\label{sec:estados}
 Para melhor gerenciar o estado do analisador léxico, utilizamos a funcionalidade de estados do Flex. Em especial, foram criados 2 estados diferentes: \texttt{IN\_COMMENT} e \texttt{IN\_STRING}. 
 
 \subsection{Comentários}
@@ -209,10 +217,66 @@ As strings são sequências de caracteres delimitadas por aspas duplas (\texttt{
 
 Para isso, foi-se utilizado a função \texttt{yymore()} do Flex, que permite concatenar a string lida em \texttt{yytext} com a próxima parte da string lida, até que o caractere de fechamento (\texttt{\"}) seja encontrado.
 
-\section{Descrição da linguagem regular}
 
-\section{Aceitador}
+\section{Gramática da Linguagem Simple-C}
+\label{sec:gram}
+A partir da definição dos tokens na Seção \ref{sec:token} com a Tabela \ref{tab:tokens}, a linguagem Simple-C pode ser gerada pela gramática livre de contexto definida pela tupla na Equação \ref{eq:gram}. 
 
-\section{Conclusão}
+Neste contexto, $\Sigma$ é o conjunto de variáveis não terminais (alfabeto), $P$ é o conjunto de regras de produção, $S$ é o símbolo inicial da derivação e $A$ é o conjunto de variáveis não terminais.
+\begin{equation}
+    \label{eq:gram}
+    \boldsymbol{G = (\Sigma, P, S, A)}
+\end{equation}
+
+\textbf{Conjunto de Variáveis Não-Terminais ($A$)}
+
+\textbf{Alfabeto ($\Sigma$)}
+\begin{multline*}
+\Sigma = \{ \text{IDENTIFICADOR}, \text{PONTO\_VIRGULA}, \text{OP\_ATRIBUICAO}, \text{OP\_SOMA}, \text{OP\_SUB}, \\
+\text{OP\_MULT}, \text{OP\_DIV}, \text{OP\_INC}, \text{OP\_DEC}, \text{KEYWORD\_INT}, \text{KEYWORD\_FLOAT}, \\
+\text{KEYWORD\_STRING}, \text{KEYWORD\_BOOL}, \text{INT}, \text{FLOAT}, \text{STRING}, \text{CHAR}, \\
+\text{BOOLEAN\_LITERAL}, \text{ABRE\_PARENTESES}, \text{FECHA\_PARENTESES}, \text{ABRE\_CHAVES}, \\
+\text{FECHA\_CHAVES}, \text{KEYWORD\_IF}, \text{KEYWORD\_ELSE}, \text{KEYWORD\_FOR}, \text{KEYWORD\_WHILE}, \\
+\text{KEYWORD\_DO}, \text{OP\_IGUAL}, \text{OP\_DIFERENTE}, \text{OP\_MENOR}, \text{OP\_MAIOR}, \text{OP\_MENOR\_IGUAL}, \\
+\text{OP\_MAIOR\_IGUAL}, \epsilon \}
+\end{multline*}
+
+\textbf{Conjunto de Regras de Produção ($P$)}
+\vspace{1em}
+\begin{itemize}
+ \item $\text{<Programa>} \rightarrow \text{<ListaDeComandos>}$
+ \item $\text{<ListaDeComandos>} \rightarrow \text{<Comando>} \mid \text{<Comando> <ListaDeComandos>}$
+ \item $\text{<Comando>} \rightarrow \text{<Declaracao>} \mid \text{<Atribuicao>} \mid \text{<EstruturaDeControle>} \mid \text{<ChamadaDeFuncao>} \mid \text{<Bloco>}$
+ \item $\text{<Declaracao>} \rightarrow \text{<Tipo> IDENTIFICADOR <AtribuicaoOpcional> PONTO\_VIRGULA}$
+ \item $\text{<Atribuicao>} \rightarrow \text{IDENTIFICADOR OP\_ATRIBUICAO <Expressao> PONTO\_VIRGULA}$
+ \item $\text{<AtribuicaoOpcional>} \rightarrow \text{OP\_ATRIBUICAO <Expressao>} \mid \epsilon$
+ \item $\text{<Tipo>} \rightarrow \text{KEYWORD\_INT} \mid \text{KEYWORD\_FLOAT} \mid \text{KEYWORD\_STRING} \mid \text{KEYWORD\_BOOL}$
+ \item $\text{<Literais>} \rightarrow \text{INT} \mid \text{FLOAT} \mid \text{STRING} \mid \text{CHAR} \mid \text{BOOLEAN\_LITERAL}$
+ \item $\text{<Expressao>} \rightarrow \text{<Termo>} \mid \text{<Expressao> OP\_SOMA <Termo>} \mid \text{<Expressao> OP\_SUB <Termo>}$
+ \item $\text{<Termo>} \rightarrow \text{<Fator>} \mid \text{<Termo> OP\_MULT <Fator>} \mid \text{<Termo> OP\_DIV <Fator>}$
+ \item $\text{<Fator>} \rightarrow \text{IDENTIFICADOR} \mid \text{<Literais>} \mid \text{ABRE\_PARENTESES <Expressao> FECHA\_PARENTESES} \mid \text{OP\_INC} \mid \text{OP\_DEC}$
+ \item $\text{<EstruturaDeControle>} \rightarrow \text{<If>} \mid \text{<For>} \mid \text{<While>}$
+ \item $\text{<If>} \rightarrow \text{KEYWORD\_IF ABRE\_PARENTESES <Condicao> FECHA\_PARENTESES <Comando> <ElseOpcional>}$
+ \item $\text{<ElseOpcional>} \rightarrow \text{KEYWORD\_ELSE <Comando>} \mid \epsilon$
+ \item $\text{<Condicao>} \rightarrow \text{<Expressao> <OperadorRelacional> <Expressao>}$
+ \item $\text{<OperadorRelacional>} \rightarrow \text{OP\_IGUAL} \mid \text{OP\_DIFERENTE} \mid \text{OP\_MENOR} \mid \text{OP\_MAIOR} \mid \text{OP\_MENOR\_IGUAL} \mid \text{OP\_MAIOR\_IGUAL}$
+ \item $\text{<Bloco>} \rightarrow \text{ABRE\_CHAVES <ListaDeComandos> FECHA\_CHAVES}$
+\end{itemize}
+\vspace{2em}
+
+\begin{multline*}
+A = \{ \text{<Programa>}, \text{<ListaDeComandos>}, \text{<Comando>}, \text{<Declaracao>}, \\
+\text{<Atribuicao>}, \text{<AtribuicaoOpcional>}, \text{<Tipo>}, \text{<Literais>}, \text{<Expressao>}, \\
+\text{<Termo>}, \text{<Fator>}, \text{<EstruturaDeControle>}, \text{<If>}, \text{<ElseOpcional>}, \\
+\text{<Condicao>}, \text{<OperadorRelacional>}, \text{<Bloco>}, \text{<ChamadaDeFuncao>}, \\
+\text{<For>}, \text{<While>}, \text{<DoWhile>} \}
+\end{multline*}
+
+\textbf{Símbolo Inicial ($S$)}
+\vspace{1em}
+$S = \text{<Programa>}$
+
+
 
 \end{document}
+

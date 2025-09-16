@@ -24,7 +24,6 @@ void set_debug_mode() {
 
 int main(int argc, char **argv) {
   set_debug_mode();
-  init_file_table(MAX_ENTRY_SIZE);
 
   return 0;
 }
