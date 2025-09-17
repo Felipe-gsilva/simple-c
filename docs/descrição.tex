@@ -170,9 +170,9 @@ A linguagem regular estruturada para a aceitação de cadeias pelo analisador l�
 \midrule
 \texttt{\detokenize{[a-zA-Z_][a-zA-Z0-9_]*}} & Reconhece identificadores válidos que começam com uma letra ou um sublinhado. & Identificador \\
 \addlinespace
-\texttt{\detokenize{[0-9]+}} & Reconhece números inteiros. & Literal \\
+\texttt{\detokenize{0|[+-]?[1-9][0-9]*}} & Reconhece números inteiros. & Literal \\
 \addlinespace
-\texttt{\detokenize{[0-9]+\.[0-9]*|\.[0-9]+}} & Reconhece números de ponto flutuante. & Literal \\
+\texttt{\detokenize{[+-]?([0-9]+\.[0-9]*|\.[0-9]+)}} & Reconhece números de ponto flutuante. & Literal \\
 \midrule
 \texttt{\detokenize{//.*}} & Comentário de linha única, que começa com \texttt{//} e vai até o final da linha. & Comentário \\
 \addlinespace
@@ -191,17 +191,10 @@ A linguagem regular estruturada para a aceitação de cadeias pelo analisador l�
 \texttt{\detokenize{{INT}{ID}}} & Captura identificadores que começam com um número, que é um erro léxico. & Erro \\
 \addlinespace
 \texttt{\detokenize{.}} & Captura qualquer caractere que não corresponda a nenhuma regra. & Erro \\
+\texttt{\detokenize{[+-]?0[0-9]+}} & Captura números inteiros com zeros à esquerda, que é um erro léxico. & Erro \\
+\addlinespace
 \bottomrule
 \end{tabular}
 \end{table}
-
-Ainda, é possível visualizar o diagrama aceitador da linguagem regular do analisador léxico na Figura \ref{fig:placeholder}.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\linewidth]{}
-    \caption{Caption}
-    \label{fig:placeholder}
-\end{figure}
 
 \end{document}

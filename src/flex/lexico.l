@@ -17,8 +17,8 @@
 %x IN_COMMENT IN_STRING
 
 ID        [a-zA-Z_][a-zA-Z0-9_]*
-INT       [0-9]+
-FLOAT     [0-9]+\.[0-9]*|\.[0-9]+
+INT       0|[+-]?[1-9][0-9]*
+FLOAT     [+-]?([0-9]+\.[0-9]*|\.[0-9]+)
 
 %%
 
@@ -70,9 +70,11 @@ FLOAT     [0-9]+\.[0-9]*|\.[0-9]+
                             return 0;
                            }
 
-{ID}      { print_token("IDENTIFICADOR"); update_col(); }
 {FLOAT}   { print_token("FLOAT"); update_col(); }
+[+-]?0[0-9]+ { print_error("Literal inteiro não pode ter zeros à esquerda"); update_col(); }
 {INT}     { print_token("INT"); update_col(); }
+
+{ID}      { print_token("IDENTIFICADOR"); update_col(); }
 \'(\\.|[^'\\])\'   { print_token("CHAR"); update_col(); }
 
 \=\=      { print_token("OP_IGUAL"); update_col(); }

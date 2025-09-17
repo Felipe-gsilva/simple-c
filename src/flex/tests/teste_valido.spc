@@ -13,7 +13,11 @@ void uma_funcao_sem_retorno(int param1, float param2);
 int main() {
     // Declaração de todos os tipos de dados primitivos
     int i = 12345;
+    int i_2 = -12345;
     float _f = .5;
+    float _f = 0.555555;
+    float _f2 = 0.000005;
+    float _f3 = 1.000000;
     char c = 'A';
     bool flag = true;
     char newline = '\n'; // Teste de escape em char
@@ -30,7 +34,7 @@ int main() {
     i /= 4;
     
     // Expressão complexa com todos os operadores aritméticos
-    float calculo = (i % 5) * 3.14 - 100. + _f;
+    float calculo = (i % 5) * 3.14 - 100 + _f;
 
     // Estrutura condicional 'if-else' com operadores lógicos e relacionais
     if (flag == true && (i < 1000 || i >= 2000)) {

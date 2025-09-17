@@ -34,6 +34,9 @@
 \subsectionfont{\normalfont\normalsize\bfseries}
 \subsubsectionfont{\normalfont\normalsize\bfseries}
 
+\newcommand{\nt}[1]{\ensuremath{\langle\text{#1}\rangle}}
+\newcommand{\tm}[1]{\ensuremath{\texttt{#1}}}
+
 % Comando para marcar o texto para revisão.
 \newcommand{\rev}[1]{\textcolor{red}{#1}}
 
@@ -84,7 +87,7 @@ git clone github.com/felipe-gsilva/simple-c
  \end{verbatim}
   \item Navegue até o diretório do projeto:
  \begin{verbatim}
-cd simple-c/flex/
+cd simple-c/src/flex/
  \end{verbatim}
   \item Gere o analisador léxico usando o Flex e o compile com nosso Makefile:
  \begin{verbatim}
@@ -102,11 +105,10 @@ Foram criados alguns arquivos de teste na pasta \texttt{tests} do repositório. 
 
 Tenha em vista que o analisador sintático ainda não foi implementado, portanto, mudanças na gramática podem ocorrer futuramente.
 
-\newpage
 \section{Tokens Reconhecidos}
 \label{sec:token}
 
-O analisador léxico do Simple C reconhece os seguintes tokens:
+O analisador léxico da linguagem Simple C toma a decisão de aceitar ou não determinada sentença com base nos tokens destacados na Tabela \ref{tab:tokens}
 
 \begin{longtable}{lll}
 \caption{Tabela de Tokens do Simple C}
@@ -195,6 +197,7 @@ ABRE\_COLCHETES & \texttt{[} & Abre a declaração/acesso de um array. \\
 FECHA\_COLCHETES & \texttt{]} & Fecha a declaração/acesso de um array. \\
 \end{longtable}
 
+
 \section{Análise de Erros}
 \label{sec:err}
 
@@ -228,54 +231,71 @@ Neste contexto, $\Sigma$ é o conjunto de variáveis não terminais (alfabeto), 
     \boldsymbol{G = (\Sigma, P, S, A)}
 \end{equation}
 
-\textbf{Conjunto de Variáveis Não-Terminais ($A$)}
+\begin{description}
+  \item[Conjunto de Símbolos Terminais ($\Sigma$)] 
+    Este é o conjunto de símbolos terminais (tokens) que formam as sentenças da linguagem.
+    \[
+    \Sigma = \left\{
+        \begin{alignedat}{3}
+        & \tm{IDENTIFICADOR}, && \tm{PONTO\_VIRGULA}, && \tm{OP\_ATRIBUICAO}, \\
+        & \tm{OP\_SOMA}, && \tm{OP\_SUB}, && \tm{OP\_MULT}, \\
+        & \tm{OP\_DIV}, && \tm{OP\_INC}, && \tm{OP\_DEC}, \\
+        & \tm{KEYWORD\_INT}, && \tm{KEYWORD\_FLOAT}, && \tm{KEYWORD\_STRING}, \\
+        & \tm{KEYWORD\_BOOL}, && \tm{INT}, && \tm{FLOAT}, \\
+        & \tm{STRING}, && \tm{CHAR}, && \tm{BOOLEAN\_LITERAL}, \\
+        & \tm{ABRE\_PARENTESES}, && \tm{FECHA\_PARENTESES}, && \tm{ABRE\_CHAVES}, \\
+        & \tm{FECHA\_CHAVES}, && \tm{KEYWORD\_IF}, && \tm{KEYWORD\_ELSE}, \\
+        & \tm{KEYWORD\_FOR}, && \tm{KEYWORD\_WHILE}, && \tm{KEYWORD\_DO}, \\
+        & \tm{OP\_IGUAL}, && \tm{OP\_DIFERENTE}, && \tm{OP\_MENOR}, \\
+        & \tm{OP\_MAIOR}, && \tm{OP\_MENOR\_IGUAL}, && \tm{OP\_MAIOR\_IGUAL}, \\
+        & \epsilon
+        \end{alignedat}
+    \right\}
+    \]
 
-\textbf{Alfabeto ($\Sigma$)}
-\begin{multline*}
-\Sigma = \{ \text{IDENTIFICADOR}, \text{PONTO\_VIRGULA}, \text{OP\_ATRIBUICAO}, \text{OP\_SOMA}, \text{OP\_SUB}, \\
-\text{OP\_MULT}, \text{OP\_DIV}, \text{OP\_INC}, \text{OP\_DEC}, \text{KEYWORD\_INT}, \text{KEYWORD\_FLOAT}, \\
-\text{KEYWORD\_STRING}, \text{KEYWORD\_BOOL}, \text{INT}, \text{FLOAT}, \text{STRING}, \text{CHAR}, \\
-\text{BOOLEAN\_LITERAL}, \text{ABRE\_PARENTESES}, \text{FECHA\_PARENTESES}, \text{ABRE\_CHAVES}, \\
-\text{FECHA\_CHAVES}, \text{KEYWORD\_IF}, \text{KEYWORD\_ELSE}, \text{KEYWORD\_FOR}, \text{KEYWORD\_WHILE}, \\
-\text{KEYWORD\_DO}, \text{OP\_IGUAL}, \text{OP\_DIFERENTE}, \text{OP\_MENOR}, \text{OP\_MAIOR}, \text{OP\_MENOR\_IGUAL}, \\
-\text{OP\_MAIOR\_IGUAL}, \epsilon \}
-\end{multline*}
+    \item[Conjunto de Regras de Produção ($P$)]: 
+    O conjunto das regras de produção é definido por:
 
-\textbf{Conjunto de Regras de Produção ($P$)}
-\vspace{1em}
-\begin{itemize}
- \item $\text{<Programa>} \rightarrow \text{<ListaDeComandos>}$
- \item $\text{<ListaDeComandos>} \rightarrow \text{<Comando>} \mid \text{<Comando> <ListaDeComandos>}$
- \item $\text{<Comando>} \rightarrow \text{<Declaracao>} \mid \text{<Atribuicao>} \mid \text{<EstruturaDeControle>} \mid \text{<ChamadaDeFuncao>} \mid \text{<Bloco>}$
- \item $\text{<Declaracao>} \rightarrow \text{<Tipo> IDENTIFICADOR <AtribuicaoOpcional> PONTO\_VIRGULA}$
- \item $\text{<Atribuicao>} \rightarrow \text{IDENTIFICADOR OP\_ATRIBUICAO <Expressao> PONTO\_VIRGULA}$
- \item $\text{<AtribuicaoOpcional>} \rightarrow \text{OP\_ATRIBUICAO <Expressao>} \mid \epsilon$
- \item $\text{<Tipo>} \rightarrow \text{KEYWORD\_INT} \mid \text{KEYWORD\_FLOAT} \mid \text{KEYWORD\_STRING} \mid \text{KEYWORD\_BOOL}$
- \item $\text{<Literais>} \rightarrow \text{INT} \mid \text{FLOAT} \mid \text{STRING} \mid \text{CHAR} \mid \text{BOOLEAN\_LITERAL}$
- \item $\text{<Expressao>} \rightarrow \text{<Termo>} \mid \text{<Expressao> OP\_SOMA <Termo>} \mid \text{<Expressao> OP\_SUB <Termo>}$
- \item $\text{<Termo>} \rightarrow \text{<Fator>} \mid \text{<Termo> OP\_MULT <Fator>} \mid \text{<Termo> OP\_DIV <Fator>}$
- \item $\text{<Fator>} \rightarrow \text{IDENTIFICADOR} \mid \text{<Literais>} \mid \text{ABRE\_PARENTESES <Expressao> FECHA\_PARENTESES} \mid \text{OP\_INC} \mid \text{OP\_DEC}$
- \item $\text{<EstruturaDeControle>} \rightarrow \text{<If>} \mid \text{<For>} \mid \text{<While>}$
- \item $\text{<If>} \rightarrow \text{KEYWORD\_IF ABRE\_PARENTESES <Condicao> FECHA\_PARENTESES <Comando> <ElseOpcional>}$
- \item $\text{<ElseOpcional>} \rightarrow \text{KEYWORD\_ELSE <Comando>} \mid \epsilon$
- \item $\text{<Condicao>} \rightarrow \text{<Expressao> <OperadorRelacional> <Expressao>}$
- \item $\text{<OperadorRelacional>} \rightarrow \text{OP\_IGUAL} \mid \text{OP\_DIFERENTE} \mid \text{OP\_MENOR} \mid \text{OP\_MAIOR} \mid \text{OP\_MENOR\_IGUAL} \mid \text{OP\_MAIOR\_IGUAL}$
- \item $\text{<Bloco>} \rightarrow \text{ABRE\_CHAVES <ListaDeComandos> FECHA\_CHAVES}$
-\end{itemize}
-\vspace{2em}
+    \item[\nt{Programa}] $\rightarrow$ \nt{ListaDeComandos}
+    \item[\nt{ListaDeComandos}] $\rightarrow$ \nt{Comando} $\mid$ \nt{Comando} \nt{ListaDeComandos}
+    \item[\nt{Comando}] $\rightarrow$ \nt{Declaracao} $\mid$ \nt{Atribuicao} $\mid$ \nt{EstruturaDeControle} $\mid$ \nt{ChamadaDeFuncao} $\mid$ \nt{Bloco}
+    \item[\nt{Declaracao}] $\rightarrow$ \nt{Tipo} IDENTIFICADOR \nt{AtribuicaoOpcional} PONTO\_VIRGULA
+    \item[\nt{Atribuicao}] $\rightarrow$ IDENTIFICADOR OP\_ATRIBUICAO \nt{Expressao} PONTO\_VIRGULA
+    \item[\nt{AtribuicaoOpcional}] $\rightarrow$ OP\_ATRIBUICAO \nt{Expressao} $\mid$ $\epsilon$
+    \item[\nt{Tipo}] $\rightarrow$ KEYWORD\_INT $\mid$ KEYWORD\_FLOAT $\mid$ KEYWORD\_STRING $\mid$ KEYWORD\_BOOL
+    \item[\nt{Literais}] $\rightarrow$ INT $\mid$ FLOAT $\mid$ STRING $\mid$ CHAR $\mid$ BOOLEAN\_LITERAL
+    \item[\nt{Expressao}] $\rightarrow$ \nt{Termo} $\mid$ \nt{Expressao} OP\_SOMA \nt{Termo} $\mid$ \nt{Expressao} OP\_SUB \nt{Termo}
+    \item[\nt{Termo}] $\rightarrow$ \nt{Fator} $\mid$ \nt{Termo} OP\_MULT \nt{Fator} $\mid$ \nt{Termo} OP\_DIV \nt{Fator}
+    \item[\nt{Fator}] $\rightarrow$ IDENTIFICADOR $\mid$ \nt{Literais} $\mid$ ABRE\_PARENTESES \nt{Expressao} FECHA\_PARENTESES $\mid$ OP\_INC $\mid$ OP\_DEC
+    \item[\nt{EstruturaDeControle}] $\rightarrow$ \nt{If} $\mid$ \nt{For} $\mid$ \nt{While}
+    \item[\nt{If}] $\rightarrow$ KEYWORD\_IF ABRE\_PARENTESES \nt{Condicao} FECHA\_PARENTESES \nt{Comando} \nt{ElseOpcional}
+    \item[\nt{ElseOpcional}] $\rightarrow$ KEYWORD\_ELSE \nt{Comando} $\mid$ $\epsilon$
+    \item[\nt{Condicao}] $\rightarrow$ \nt{Expressao} \nt{OperadorRelacional} \nt{Expressao}
+    \item[\nt{OperadorRelacional}] $\rightarrow$ OP\_IGUAL $\mid$ OP\_DIFERENTE $\mid$ OP\_MENOR $\mid$ OP\_MAIOR $\mid$ OP\_MENOR\_IGUAL $\mid$ OP\_MAIOR\_IGUAL
+    \item[\nt{Bloco}] $\rightarrow$ ABRE\_CHAVES \nt{ListaDeComandos} FECHA\_CHAVES
 
-\begin{multline*}
-A = \{ \text{<Programa>}, \text{<ListaDeComandos>}, \text{<Comando>}, \text{<Declaracao>}, \\
-\text{<Atribuicao>}, \text{<AtribuicaoOpcional>}, \text{<Tipo>}, \text{<Literais>}, \text{<Expressao>}, \\
-\text{<Termo>}, \text{<Fator>}, \text{<EstruturaDeControle>}, \text{<If>}, \text{<ElseOpcional>}, \\
-\text{<Condicao>}, \text{<OperadorRelacional>}, \text{<Bloco>}, \text{<ChamadaDeFuncao>}, \\
-\text{<For>}, \text{<While>}, \text{<DoWhile>} \}
-\end{multline*}
+    \item[Conjunto de Não-Terminais ($A$)] 
+    O conjunto de símbolos não-terminais é definido por:
+    \[
+    A = \left\{
+        \begin{alignedat}{3}
+        & \nt{Programa}, && \nt{ListaDeComandos}, && \nt{Comando}, \\
+        & \nt{Declaracao}, && \nt{Atribuicao}, && \nt{AtribuicaoOpcional}, \\
+        & \nt{Tipo}, && \nt{Literais}, && \nt{Expressao}, \\
+        & \nt{Termo}, && \nt{Fator}, && \nt{EstruturaDeControle}, \\
+        & \nt{If}, && \nt{ElseOpcional}, && \nt{Condicao}, \\
+        & \nt{OperadorRelacional}, \quad && \nt{Bloco}, && \nt{ChamadaDeFuncao}, \\
+        & \nt{For}, && \nt{While}, && \nt{DoWhile}
+        \end{alignedat}
+    \right\}
+    \]
 
-\textbf{Símbolo Inicial ($S$)}
-\vspace{1em}
-$S = \text{<Programa>}$
-
+    \item[Símbolo Inicial ($S$)] 
+    O símbolo inicial da gramática é:
+    \[
+    S = \nt{Programa}
+    \]
+\end{description}
 
 
 \end{document}
