@@ -76,8 +76,15 @@ int main() {
     }
 
     // Teste de literais de string, incluindo escapes
-    char* s = "Esta é uma string de teste com \"aspas\" escapadas.";
-    char* outra_string_123 = "outra string";
+    string s = "Esta é uma string de teste com \"aspas\" escapadas.";
+    string outra_string_123 = "outra string";
+    string string_com_3_linhas = 
+    """
+    Linha 1\nLinha 2\nLinha 3
+    """;
+
+    bool resultado = true; // Variável booleana para teste
+    resultado = false; // Atribuição de valor booleano
 
     return resultado_final; // Fim do programa
 }

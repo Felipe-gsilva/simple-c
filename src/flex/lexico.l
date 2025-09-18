@@ -14,7 +14,7 @@
   }
 %}
 
-%x IN_COMMENT IN_STRING
+%x IN_COMMENT IN_STRING IN_MULTI_STRING
 
 ID        [a-zA-Z_][a-zA-Z0-9_]*
 INT       0|[+-]?[1-9][0-9]*
@@ -54,8 +54,20 @@ FLOAT     [+-]?([0-9]+\.[0-9]*|\.[0-9]+)
 "while"    { print_token("KEYWORD_WHILE"); update_col(); }
 "return"   { print_token("KEYWORD_RETURN"); update_col(); }
 
-"true"    { print_token("BOOLEAN_LITERAL"); update_col(); }
-"false"   { print_token("BOOLEAN_LITERAL"); update_col(); }
+(true)|(false)    { print_token("BOOLEAN_LITERAL"); update_col(); }
+
+
+\"\"\"                           { BEGIN(IN_MULTI_STRING); yymore(); }
+<IN_MULTI_STRING>(\\.|[^\\"\n])+ { yymore(); }
+<IN_MULTI_STRING>(\"\"\")        { print_token("STRING"); update_col(); BEGIN(INITIAL); }
+<IN_MULTI_STRING>\n              {
+                                 current_line++; current_col = 1;
+                                 yymore();
+                                 }
+<IN_MULTI_STRING><<EOF>>         {
+                                 print_error("String não foi fechada");
+                                 return 0;
+                                 }
 
 \"                         { BEGIN(IN_STRING); yymore(); }
 <IN_STRING>(\\.|[^\\"\n])+ { yymore(); }
@@ -69,6 +81,7 @@ FLOAT     [+-]?([0-9]+\.[0-9]*|\.[0-9]+)
                             print_error("String não foi fechada");
                             return 0;
                            }
+
 
 {FLOAT}   { print_token("FLOAT"); update_col(); }
 [+-]?0[0-9]+ { print_error("Literal inteiro não pode ter zeros à esquerda"); update_col(); }
@@ -115,7 +128,13 @@ FLOAT     [+-]?([0-9]+\.[0-9]*|\.[0-9]+)
 
 %%
 void print_token(char *token) {
-  printf("Linha %03d, Col %03d | %-20s =>\t%s\n", current_line, current_col, token, yytext);
+  printf(
+      "Linha %03d, Col %03d | %-20s =>\t%s\n",
+      current_line,
+      current_col,
+      token,
+      yytext
+  );
 }
 
 void print_error(char* error_type) {
