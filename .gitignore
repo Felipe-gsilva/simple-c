@@ -1,2 +1,4 @@
 build
 target
+simple-c
+lex.yy.c

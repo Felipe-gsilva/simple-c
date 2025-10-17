@@ -2,15 +2,26 @@
 %{
   #include <stdio.h>
   #include <string.h>
+  #include "sintatico.tab.h"
+
+  #define MAX_STR_LEN 8192
+  char string_buf[MAX_STR_LEN];
+  char *string_buf_ptr;
 
   int current_line = 1;
   int current_col = 1;
 
-  void print_token(char* token);
   void print_error(char* error_type);
 
   void update_col() {
     current_col += yyleng;
+  }
+  void add_char_to_string(char c) {
+    if (string_buf_ptr < string_buf + MAX_STR_LEN - 1) {
+      *string_buf_ptr++ = c;
+    } else {
+      print_error("Literal de string excedeu o tamanho máximo do buffer");
+    }
   }
 %}
 
@@ -36,106 +47,181 @@ FLOAT     [+-]?([0-9]+\.[0-9]*|\.[0-9]+)
     return 0;
 }
 
-"int"      { print_token("KEYWORD_INT"); update_col(); }
-"float"    { print_token("KEYWORD_FLOAT"); update_col(); }
-"char"     { print_token("KEYWORD_CHAR"); update_col(); }
-"string"   { print_token("KEYWORD_STRING"); update_col(); }
-"void"     { print_token("KEYWORD_VOID"); update_col(); }
-"bool"     { print_token("KEYWORD_BOOL"); update_col(); }
-"if"       { print_token("KEYWORD_IF"); update_col(); }
-"else"     { print_token("KEYWORD_ELSE"); update_col(); }
-"for"      { print_token("KEYWORD_FOR"); update_col(); }
-"break"    { print_token("KEYWORD_BREAK"); update_col(); }
-"continue" { print_token("KEYWORD_CONTINUE"); update_col(); }
-"switch"   { print_token("KEYWORD_SWITCH"); update_col(); }
-"case"     { print_token("KEYWORD_CASE"); update_col(); }
-"default"  { print_token("KEYWORD_DEFAULT"); update_col(); }
-"do"       { print_token("KEYWORD_DO"); update_col(); }
-"while"    { print_token("KEYWORD_WHILE"); update_col(); }
-"return"   { print_token("KEYWORD_RETURN"); update_col(); }
+"int"      { update_col();  return KEYWORD_INT; }
+"float"    { update_col(); return KEYWORD_FLOAT; }
+"char"     { update_col(); return KEYWORD_CHAR; }
+"string"   { update_col(); return KEYWORD_STRING; }
+"void"     { update_col(); return KEYWORD_VOID; }
+"bool"     { update_col(); return KEYWORD_BOOL; }
+"if"       { update_col(); return KEYWORD_IF; }
+"else"     { update_col(); return KEYWORD_ELSE; }
+"for"      { update_col(); return KEYWORD_FOR; }
+"break"    { update_col(); return KEYWORD_BREAK; }
+"continue" { update_col(); return KEYWORD_CONTINUE; }
+"switch"   { update_col(); return KEYWORD_SWITCH; }
+"case"     { update_col(); return KEYWORD_CASE; }
+"default"  { update_col(); return KEYWORD_DEFAULT; }
+"do"       { update_col(); return KEYWORD_DO; }
+"while"    { update_col(); return KEYWORD_WHILE; }
+"return"   { update_col(); return KEYWORD_RETURN; }
 
-(true)|(false)    { print_token("BOOLEAN_LITERAL"); update_col(); }
-
-
-\"\"\"                           { BEGIN(IN_MULTI_STRING); yymore(); }
-<IN_MULTI_STRING>(\\.|[^\\"\n])+ { yymore(); }
-<IN_MULTI_STRING>(\"\"\")        { print_token("STRING"); update_col(); BEGIN(INITIAL); }
-<IN_MULTI_STRING>\n              {
-                                 current_line++; current_col = 1;
-                                 yymore();
-                                 }
-<IN_MULTI_STRING><<EOF>>         {
-                                 print_error("String não foi fechada");
-                                 return 0;
-                                 }
-
-\"                         { BEGIN(IN_STRING); yymore(); }
-<IN_STRING>(\\.|[^\\"\n])+ { yymore(); }
-<IN_STRING>\"              { print_token("STRING"); update_col(); BEGIN(INITIAL); }
-<IN_STRING>\n              {
-                            print_error("String multilinha não permitida");
-                            current_line++; current_col = 1;
-                            BEGIN(INITIAL);
-                           }
-<IN_STRING><<EOF>>         {
-                            print_error("String não foi fechada");
-                            return 0;
-                           }
+(true)      { yylval.int_val = 1; update_col(); return BOOLEAN_LITERAL; }
+(false)     { yylval.int_val = 0; update_col(); return BOOLEAN_LITERAL; }
 
 
-{FLOAT}   { print_token("FLOAT"); update_col(); }
+\"                  { 
+  string_buf_ptr = string_buf;
+  BEGIN(IN_STRING); 
+}
+<IN_STRING>{
+  \"                { 
+                        *string_buf_ptr = '\0';
+                        yylval.str_val = strdup(string_buf);
+                        update_col();
+                        BEGIN(INITIAL);
+                        return STRING_LITERAL;
+                    }
+
+  \n                {
+                        print_error("Quebra de linha inesperada em literal de string");
+                        current_line++; 
+                        current_col = 1;
+                        BEGIN(INITIAL);
+                    }
+
+  <<EOF>>           {
+                        print_error("String não foi fechada (fim de arquivo inesperado)");
+                        BEGIN(INITIAL);
+                        return 0;
+  }
+  \\[ntr"\\']      { 
+                        switch (yytext[1]) {
+                            case 'n': add_char_to_string('\n'); break;
+                            case 't': add_char_to_string('\t'); break;
+                            case 'r': add_char_to_string('\r'); break;
+                            case '"': add_char_to_string('\"'); break;
+                            case '\\': add_char_to_string('\\'); break;
+                            case '\'': add_char_to_string('\''); break;
+                        }
+                    }
+
+  [^\\"\n]+         { 
+                        char *yptr = yytext;
+                        while (*yptr) {
+                            add_char_to_string(*yptr++);
+                        }
+                    }
+}
+
+\"\"\"               { 
+                        string_buf_ptr = string_buf;
+                        BEGIN(IN_MULTI_STRING); 
+                    }
+<IN_MULTI_STRING>{
+  \"\"\"             { 
+                        *string_buf_ptr = '\0';
+                        yylval.str_val = strdup(string_buf);
+                        update_col();
+                        BEGIN(INITIAL);
+                        return STRING_LITERAL;
+                    }
+
+  \n                {
+                        add_char_to_string('\n');
+                        current_line++; 
+                        current_col = 1;
+                    }
+
+  <<EOF>>           {
+                        print_error("String multilinha não foi fechada (fim de arquivo inesperado)");
+                        BEGIN(INITIAL);
+                        return 0;
+                    }
+
+  \\[ntr"\\']      { 
+                        // Processa sequências de escape (mesma lógica da string de linha única)
+                        switch (yytext[1]) {
+                            case 'n': add_char_to_string('\n'); break;
+                            case 't': add_char_to_string('\t'); break;
+                            case 'r': add_char_to_string('\r'); break;
+                            case '"': add_char_to_string('\"'); break;
+                            case '\\': add_char_to_string('\\'); break;
+                            case '\'': add_char_to_string('\''); break;
+                        }
+                    }
+
+  [^\\"\n]+         { 
+                        char *yptr = yytext;
+                        while (*yptr) {
+                            add_char_to_string(*yptr++);
+                        }
+                    }
+}
+
+
+{FLOAT}   { 
+  yylval.float_val = atof(yytext);
+  update_col(); 
+  return FLOAT_LITERAL;
+}
+
 [+-]?0[0-9]+ { print_error("Literal inteiro não pode ter zeros à esquerda"); update_col(); }
-{INT}     { print_token("INT"); update_col(); }
+{INT}     { 
+  yylval.int_val = atoi(yytext);
+  update_col(); 
+  return INT_LITERAL;
+}
 
-{ID}      { print_token("IDENTIFICADOR"); update_col(); }
-\'(\\.|[^'\\])\'   { print_token("CHAR"); update_col(); }
 
-\=\=      { print_token("OP_IGUAL"); update_col(); }
-\!=      { print_token("OP_DIFERENTE"); update_col(); }
-\<\=      { print_token("OP_MENOR_IGUAL"); update_col(); }
-\>\=      { print_token("OP_MAIOR_IGUAL"); update_col(); }
-\<       { print_token("OP_MENOR"); update_col(); }
-\>       { print_token("OP_MAIOR"); update_col(); }
-!        { print_token("OP_NOT"); update_col(); }
-\&\&      { print_token("OP_AND"); update_col(); }
-\|\|      { print_token("OP_OR"); update_col(); }
-\=       { print_token("OP_ATRIBUICAO"); update_col(); }
-\+       { print_token("OP_SOMA"); update_col(); }
-\-       { print_token("OP_SUB"); update_col(); }
-\*       { print_token("OP_MULT"); update_col(); }
-\/       { print_token("OP_DIV"); update_col(); }
-\+\=      { print_token("OP_INC_ATRIBUICAO"); update_col(); }
-\-\=     { print_token("OP_DEC_ATRIBUICAO"); update_col(); }
-\/\=    { print_token("OP_DIV_ATRIBUICAO"); update_col(); }
-\*\=    { print_token("OP_MULT_ATRIBUICAO"); update_col(); }
-\-\-     { print_token("OP_DEC"); update_col(); }
-\+\+     { print_token("OP_INC"); update_col(); }
-\%       { print_token("OP_MOD"); update_col(); }
+{ID}      {
+  yylval.str_val = strdup(yytext);
+  update_col(); 
+  return IDENTIFICADOR;
+}
 
-\;       { print_token("PONTO_VIRGULA"); update_col(); }
-\:       { print_token("DOIS_PONTOS"); update_col(); }
-\(       { print_token("ABRE_PARENTESES"); update_col(); }
-\)       { print_token("FECHA_PARENTESES"); update_col(); }
-\{       { print_token("ABRE_CHAVES"); update_col(); }
-\}       { print_token("FECHA_CHAVES"); update_col(); }
-\,       { print_token("VIRGULA"); update_col(); }
-\[       { print_token("ABRE_COLCHETES"); update_col(); }
-\]       { print_token("FECHA_COLCHETES"); update_col(); }
+\'(\\.|[^'\\])\'   { 
+  yylval.char_val = yytext[1];
+  update_col(); 
+  return CHAR_LITERAL;
+}
+
+\=\=     { update_col(); return OP_IGUAL; }
+\!=      { update_col(); return OP_DIFERENTE; }
+\<\=     { update_col(); return OP_MENOR_IGUAL; }
+\>\=     { update_col(); return OP_MAIOR_IGUAL; }
+\<       { update_col(); return OP_MENOR; }
+\>       { update_col(); return OP_MAIOR; }
+!        { update_col(); return OP_NOT; }
+\&\&     { update_col(); return OP_AND; }
+\|\|     { update_col(); return OP_OR; }
+\=       { update_col(); return OP_ATRIBUICAO; }
+\+       { update_col(); return OP_SOMA; }
+\-       { update_col(); return OP_SUB; }
+\*       { update_col(); return OP_MULT; }
+\/       { update_col(); return OP_DIV; }
+\+\=     { update_col(); return OP_INC_ATRIBUICAO; }
+\-\=     { update_col(); return OP_DEC_ATRIBUICAO; }
+\/\=     { update_col(); return OP_DIV_ATRIBUICAO; }
+\*\=     { update_col(); return OP_MULT_ATRIBUICAO; }
+\-\-     { update_col(); return OP_DEC; }
+\+\+     { update_col(); return OP_INC; }
+\%       { update_col(); return OP_MOD; }
+
+\;       { update_col(); return PONTO_VIRGULA; }
+\:       { update_col(); return DOIS_PONTOS; }
+\(       { update_col(); return ABRE_PARENTESES; }
+\)       { update_col(); return FECHA_PARENTESES; }
+\{       { update_col(); return ABRE_CHAVES; }
+\}       { update_col(); return FECHA_CHAVES; }
+\,       { update_col(); return VIRGULA; }
+\[       { update_col(); return ABRE_COLCHETES; }
+\]       { update_col(); return FECHA_COLCHETES; }
 
 {INT}{ID} { print_error("Identificador não pode começar com número"); update_col(); }
 \'([^']{2,})\' { print_error("Literal de char mal formado, contém múltiplos caracteres"); update_col(); }
 .         { print_error("Caractere inesperado ou desconhecido"); update_col(); }
 
 %%
-void print_token(char *token) {
-  printf(
-      "Linha %03d, Col %03d | %-20s =>\t%s\n",
-      current_line,
-      current_col,
-      token,
-      yytext
-  );
-}
 
 void print_error(char* error_type) {
   fprintf(stderr, 
@@ -145,11 +231,4 @@ void print_error(char* error_type) {
     error_type,
     yytext
   );
-}
-
-int main(void) {
-  printf("Analisador Léxico com análise de erro.\n");
-  printf("Pressione CTRL+D (Linux) ou CTRL+Z (Windows) para encerrar.\n\n");
-  yylex();
-  return 0;
 }

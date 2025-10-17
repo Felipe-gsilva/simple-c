@@ -87,19 +87,27 @@ git clone github.com/felipe-gsilva/simple-c
  \end{verbatim}
   \item Navegue até o diretório do projeto:
  \begin{verbatim}
-cd simple-c/src/flex/
+   cd simple-c/
  \end{verbatim}
-  \item Gere o analisador léxico usando o Flex e o compile com nosso Makefile:
+  \item Gere o analisador léxico usando o Flex e o compile com nosso script de build
  \begin{verbatim}
-make
+   chmod +x build.sh
+  ./build.sh
  \end{verbatim}
   \item Execute o analisador léxico com um arquivo de entrada que contenha código Simple C:
  \begin{verbatim}
-./simplec < input_file.c
+   ./build/simplec < input_file.c
  \end{verbatim}
  Substitua \texttt{input\_file.c} pelo caminho do arquivo que você deseja analisar.
 
+\item Teste os analisadores com:
+  \begin{verbatim}
+    chmod +x test.sh
+    ./test.sh
+  \end{verbatim}
+
 \end{enumerate}
+
 
 Foram criados alguns arquivos de teste na pasta \texttt{tests} do repositório. Você pode usar esses arquivos para verificar o funcionamento do analisador léxico. Cada arquivo de teste contém exemplos de código Simple C que abrangem diferentes aspectos da linguagem, como declarações de variáveis, estruturas de controle, funções, entre outros. 
 
