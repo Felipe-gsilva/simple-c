@@ -1,0 +1,21 @@
+\babel@toc {brazilian}{}\relax 
+\contentsline {section}{\numberline {1}Introdução}{2}{}%
+\contentsline {section}{\numberline {2}Testando o Analisador Léxico}{2}{}%
+\contentsline {section}{\numberline {3}Tokens Reconhecidos}{3}{}%
+\contentsline {section}{\numberline {4}Descrição da Liguagem Regular - Analisador Léxico}{4}{}%
+\contentsline {section}{\numberline {5}Linguagem Livre de Contexto - Analisador Sintático}{5}{}%
+\contentsline {subsection}{\numberline {5.1}Gramática da Linguagem Livre de Contexto}{5}{}%
+\contentsline {section}{\numberline {6}Análise de Erros}{7}{}%
+\contentsline {subsection}{\numberline {6.1}Tratamento de Erros Léxicos (Flex)}{7}{}%
+\contentsline {subsection}{\numberline {6.2}Tratamento de Erros Sintáticos (Bison)}{7}{}%
+\contentsline {subsubsection}{\numberline {6.2.1}Função de Erro Sintático e Rastreamento}{8}{}%
+\contentsline {subsubsection}{\numberline {6.2.2}Precedência e Associatividade}{8}{}%
+\contentsline {section}{\numberline {7}Gerenciamento de Estados}{8}{}%
+\contentsline {subsection}{\numberline {7.1}Comentários}{8}{}%
+\contentsline {subsection}{\numberline {7.2}Strings}{8}{}%
+\contentsline {section}{\numberline {8}Exemplos de uso}{9}{}%
+\contentsline {subsection}{\numberline {8.1}Declaração de Variáveis e Tipos de Dados}{9}{}%
+\contentsline {subsection}{\numberline {8.2}Estruturas Condicionais e de Controle}{9}{}%
+\contentsline {subsection}{\numberline {8.3}Laços de Repetição}{9}{}%
+\contentsline {subsubsection}{\numberline {8.3.1}Exemplo de Laço \texttt {for}}{10}{}%
+\contentsline {subsubsection}{\numberline {8.3.2}Exemplo de Laços \texttt {while} e \texttt {do-while}}{10}{}%
