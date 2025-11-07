@@ -50,7 +50,7 @@
 	\begin{center}
 	
 	\vspace{115pt}
- \textbf{\Huge{Manual do Usuário - Simple C}}\\
+ \textbf{\Huge{Descrição Geral da Linguagem Simple C}}\\
   
 	\vspace{115pt}
  Felipe Gomes da Silva \\
@@ -64,56 +64,8 @@
 	\end{center}
 \end{titlepage}
 
-% Table of contents
-
-\tableofcontents
-\newpage
-\section{Introdução}
-\label{sec:intd}
-
-Este manual do usuário fornece uma visão geral do Simple C, uma linguagem de programação que visa simplicar o uso de conceitos fundamentais da linguagem C. O Simple C é projetado para ser fácil de aprender e usar, tornando-o ideal para iniciantes em programação, mas removendo algumas funcionalidades avançadas da linguagem C. 
-
-Neste momento, abordaremos apenas o analisador léxico da linguagem. Utilizamos a ferramenta Flex para construir o analisador léxico, que é responsável por identificar e classificar os tokens na entrada do código-fonte.
-
-\section{Testando o Analisador Léxico}
-\label{sec:test}
-
-Para testar o analisador léxico do Simple C, siga os passos abaixo:
-\begin{enumerate}
-  \item Certifique-se de ter o Flex instalado em seu sistema. Você pode verificar isso executando o comando \texttt{flex --version} no terminal.
-  \item Clone o repositório do Simple C do GitHub:
- \begin{verbatim}
-git clone github.com/felipe-gsilva/simple-c
- \end{verbatim}
-  \item Navegue até o diretório do projeto:
- \begin{verbatim}
-   cd simple-c/
- \end{verbatim}
-  \item Gere o analisador léxico usando o Flex e o compile com nosso script de build
- \begin{verbatim}
-   chmod +x build.sh
-  ./build.sh
- \end{verbatim}
-  \item Execute o analisador léxico com um arquivo de entrada que contenha código Simple C:
- \begin{verbatim}
-   ./build/simplec < input_file.c
- \end{verbatim}
- Substitua \texttt{input\_file.c} pelo caminho do arquivo que você deseja analisar.
-
-\item Teste os analisadores com:
-  \begin{verbatim}
-    chmod +x test.sh
-    ./test.sh
-  \end{verbatim}
-
-\end{enumerate}
-
-
-Foram criados alguns arquivos de teste na pasta \texttt{tests} do repositório. Você pode usar esses arquivos para verificar o funcionamento do analisador léxico. Cada arquivo de teste contém exemplos de código Simple C que abrangem diferentes aspectos da linguagem, como declarações de variáveis, estruturas de controle, funções, entre outros. 
-
-Tenha em vista que o analisador sintático ainda não foi implementado, portanto, mudanças na gramática podem ocorrer futuramente.
-
-\section{Tokens Reconhecidos}
+\section{Linguagem Regular - Analisador Léxico}
+\subsection{Tokens Reconhecidos}
 \label{sec:token}
 
 O analisador léxico da linguagem Simple C toma a decisão de aceitar ou não determinada sentença com base nos tokens destacados na Tabela \ref{tab:tokens}
@@ -205,31 +157,53 @@ ABRE\_COLCHETES & \texttt{[} & Abre a declaração/acesso de um array. \\
 FECHA\_COLCHETES & \texttt{]} & Fecha a declaração/acesso de um array. \\
 \end{longtable}
 
+\newpage
 
-\section{Análise de Erros}
-\label{sec:err}
+\subsection{Descrição}
+\label{sec:desc}
 
-A função \texttt{print\_error} exibe as mensagens de erro léxico e inclui a linha, coluna e token que causaram o erro. Para isto, utilizamos rastreamento de posição durante toda a leitura do código-fonte.
+A linguagem regular estruturada para a aceitação de cadeias pelo analisador léxico da linguagem Simple-C pode ser descrita através das expressões regulares e definições presentes na Tabela \ref{tab:expressoes}. Deste modo, é garantido que variáveis não sejam declaradas com números como primeiro caractere da cadeia, além de outros erros léxicos devidamente discutidos.
 
-\subsection{Rastreamento de Posição}
+\begin{table}[H]
+\centering
+\caption{Expressões regulares do analisador léxico.}
+\label{tab:expressoes}
+\begin{tabular}{l p{5cm} l}
+\toprule
+\textbf{Expressão Regular} & \textbf{Descrição} & \textbf{Tipo} \\
+\midrule
+\texttt{\detokenize{[a-zA-Z_][a-zA-Z0-9_]*}} & Reconhece identificadores válidos que começam com uma letra ou um sublinhado. & Identificador \\
+\addlinespace
+\texttt{\detokenize{0|[+-]?[1-9][0-9]*}} & Reconhece números inteiros. & Literal \\
+\addlinespace
+\texttt{\detokenize{[+-]?([0-9]+\.[0-9]*|\.[0-9]+)}} & Reconhece números de ponto flutuante. & Literal \\
+\midrule
+\texttt{\detokenize{//.*}} & Comentário de linha única, que começa com \texttt{//} e vai até o final da linha. & Comentário \\
+\addlinespace
+\texttt{\detokenize{/*}} & Inicia um comentário de bloco. & Comentário \\
+\addlinespace
+\texttt{\detokenize{<IN_COMMENT>"*/"}} & Fecha um comentário de bloco. & Comentário \\
+\midrule
+\texttt{\detokenize{"(\.|[^"\n])+"}} & Conteúdo de uma string, incluindo caracteres escapados. & String \\
+\addlinespace
+\texttt{\detokenize{'(\.|[^'\\])'}} & Reconhece literais de caracteres. & Caractere \\
+\midrule
+\texttt{\detokenize{==, !=, <=, >=, etc.}} & Operadores de comparação, lógicos e aritméticos. & Operador \\
+\addlinespace
+\texttt{\detokenize{;, <, >, {, }}} & Símbolos de pontuação e agrupamento. & Símbolo \\
+\midrule
+\texttt{\detokenize{{INT}{ID}}} & Captura identificadores que começam com um número, que é um erro léxico. & Erro \\
+\addlinespace
+\texttt{\detokenize{.}} & Captura qualquer caractere que não corresponda a nenhuma regra. & Erro \\
+\texttt{\detokenize{[+-]?0[0-9]+}} & Captura números inteiros com zeros à esquerda, que é um erro léxico. & Erro \\
+\addlinespace
+\bottomrule
+\end{tabular}
+\end{table}
 
-Para tratar os erros léxicos de forma eficiente, o analisador léxico do Simple C implementa um mecanismo de rastreamento de posição. Para isto, são declaradas 2 variáveis globais, \texttt{current\_line} e \texttt{current\_col}, que armazenam a linha e a coluna atuais do analisador léxico, respectivamente. Essas variáveis são atualizadas conforme o analisador lê o código-fonte, permitindo que mensagens de erro incluam informações precisas sobre a localização do erro.
+\section{Linguagem Livre de Contexto - Analisador Sintático}
 
-\section{Gerenciamento de Estados}
-\label{sec:estados}
-Para melhor gerenciar o estado do analisador léxico, utilizamos a funcionalidade de estados do Flex. Em especial, foram criados 2 estados diferentes: \texttt{IN\_COMMENT} e \texttt{IN\_STRING}. 
-
-\subsection{Comentários}
-Os comentários podem aparecer de 2 formas no código: (i) comentários de linha única, que começam com \texttt{//} e se estendem até o final da linha; (ii) comentários de bloco, que começam com \texttt{/*} e terminam com \texttt{*/}.
-
-\subsection{Strings}
-
-As strings são sequências de caracteres delimitadas por aspas duplas (\texttt{\"}). O analisador léxico reconhece strings e trata caracteres de escape, como \texttt{\textbackslash n} para nova linha e \texttt{\textbackslash t} para tabulação.
-
-Para isso, foi-se utilizado a função \texttt{yymore()} do Flex, que permite concatenar a string lida em \texttt{yytext} com a próxima parte da string lida, até que o caractere de fechamento (\texttt{\"}) seja encontrado.
-
-
-\section{Gramática da Linguagem Simple-C}
+\subsection{Gramática da Linguagem Livre de Contexto}
 \label{sec:gram}
 A partir da definição dos tokens na Seção \ref{sec:token} com a Tabela \ref{tab:tokens}, a linguagem Simple-C pode ser gerada pela gramática livre de contexto definida pela tupla na Equação \ref{eq:gram}. 
 
@@ -256,7 +230,7 @@ Neste contexto, $\Sigma$ é o conjunto de variáveis não terminais (alfabeto), 
         & \tm{KEYWORD\_FOR}, && \tm{KEYWORD\_WHILE}, && \tm{KEYWORD\_DO}, \\
         & \tm{OP\_IGUAL}, && \tm{OP\_DIFERENTE}, && \tm{OP\_MENOR}, \\
         & \tm{OP\_MAIOR}, && \tm{OP\_MENOR\_IGUAL}, && \tm{OP\_MAIOR\_IGUAL}, \\
-        & \epsilon
+        & \epsilonSymbol
         \end{alignedat}
     \right\}
     \]
@@ -269,7 +243,7 @@ Neste contexto, $\Sigma$ é o conjunto de variáveis não terminais (alfabeto), 
     \item[\nt{Comando}] $\rightarrow$ \nt{Declaracao} $\mid$ \nt{Atribuicao} $\mid$ \nt{EstruturaDeControle} $\mid$ \nt{ChamadaDeFuncao} $\mid$ \nt{Bloco}
     \item[\nt{Declaracao}] $\rightarrow$ \nt{Tipo} IDENTIFICADOR \nt{AtribuicaoOpcional} PONTO\_VIRGULA
     \item[\nt{Atribuicao}] $\rightarrow$ IDENTIFICADOR OP\_ATRIBUICAO \nt{Expressao} PONTO\_VIRGULA
-    \item[\nt{AtribuicaoOpcional}] $\rightarrow$ OP\_ATRIBUICAO \nt{Expressao} $\mid$ $\epsilon$
+    \item[\nt{AtribuicaoOpcional}] $\rightarrow$ OP\_ATRIBUICAO \nt{Expressao} $\mid$ $ \epsilonSymbol$
     \item[\nt{Tipo}] $\rightarrow$ KEYWORD\_INT $\mid$ KEYWORD\_FLOAT $\mid$ KEYWORD\_STRING $\mid$ KEYWORD\_BOOL
     \item[\nt{Literais}] $\rightarrow$ INT $\mid$ FLOAT $\mid$ STRING $\mid$ CHAR $\mid$ BOOLEAN\_LITERAL
     \item[\nt{Expressao}] $\rightarrow$ \nt{Termo} $\mid$ \nt{Expressao} OP\_SOMA \nt{Termo} $\mid$ \nt{Expressao} OP\_SUB \nt{Termo}
@@ -304,7 +278,4 @@ Neste contexto, $\Sigma$ é o conjunto de variáveis não terminais (alfabeto), 
     S = \nt{Programa}
     \]
 \end{description}
-
-
 \end{document}
-
